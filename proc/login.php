@@ -34,22 +34,4 @@ if($logged_user == null){
 
   }
 
-
-  function printJson( $message = null, $arr = null ){
-    $result_arr = array();
-    $result_arr[] = '"message":"'.$message.'"';
-    if( $arr ) {
-      foreach( $arr as $key => $value ){
-        if( is_string($value) ){
-          $result_arr[] = '"'.$key.'":"'.$value.'"';
-        }else if( is_array($value)){
-          $result_arr[] = '"'.$key.'":['.implode($value,',').']';
-        }else{
-          $result_arr[] = '"'.$key.'":'.$value.'';
-        }
-      }
-    }
-    return '{'.implode($result_arr,',').'}';
-  }
-
 ?>

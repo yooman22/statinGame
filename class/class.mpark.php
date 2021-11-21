@@ -122,7 +122,10 @@ class Mpark {
     }
   }
 
-  //라이브 정보를 가져온다.
+
+
+
+
   function getReadyStatus( $status_code ){
     global $tables;
     $sql = "SELECT * FROM ".$tables['status']." WHERE f_status_code = '".$status_code."'";
@@ -138,6 +141,105 @@ class Mpark {
     $data = mysqli_fetch_array( $query,MYSQLI_ASSOC );
     return $data;
   }
+
+
+////////////////////////////////////////////////////////////////
+function insertStep( $json_data ){
+  global $tables;
+  $dto = new Mparkstep( null );
+  $dto->setFromJson( $json_data );
+  $sql = "INSERT INTO ".$tables['step']." (f_step_title,f_step_video,f_reg_date,f_step_date,f_step_status,f_step_wincount )";
+  $sql .= " VALUES (";
+  $sql .= "'".$dto->step_title."'";
+  $sql .= ",'".$dto->step_video."'";
+  $sql .= ",now()";
+  // $sql .= ",'".$dto->step_date."'"; 이거 뭔지 물어보고 바꿔야함
+  $sql .= ",now()";
+  $sql .= ",".$dto->step_status;
+  $sql .= ",".$dto->step_wincount;
+  $sql .= ")";
+  $qry = mysqli_query($this->dbconn,$sql) or die("query error : ".$sql);
+  return $qry;
+}
+
+function updateStep( $json_data ){
+  global $tables;
+  $dto = new Mparkstep( null );
+  $dto->setFromJson( $json_data );
+  $sql = "UPDATE ".$tables['step']." SET ";
+  $sql .= "f_step_title = '".$dto->step_title."'";
+  $sql .= ",f_step_video = '".$dto->step_video."'";;
+  $sql .= ",f_step_date = '".$dto->step_date."'";
+  $sql .= ",f_step_wincount = ".$dto->step_wincount;
+  $sql .= " WHERE f_step_uid = ".$dto->step_uid;
+  $qry = mysqli_query($this->dbconn,$sql) or die("query error : ".$sql);
+  return $qry;
+}
+
+function listStep( $json_data ){
+  global $tables;
+  $dto = new Mparksearch();
+  $dto->setFromJson( $json_data );
+  $sql = "SELECT * FROM ".$tables['step']." ORDER BY f_step_status ASC,f_reg_date DESC";
+  $list = array();
+  $query = mysqli_query($this->dbconn, $sql);
+  while( $data = mysqli_fetch_array( $query,MYSQLI_ASSOC )){
+    array_push( $list, new Mparkstep($data) );
+  }
+  return $list;
+}
+
+function selectStepedQuizList( $step_uid ){
+  global $tables;
+  $sql = "SELECT A.*,B.user_count,C.f_view_content,C.f_seq_no FROM ".$tables['quiz']." A ";
+  $sql .= " LEFT JOIN ( SELECT f_quiz_uid, COUNT(*) AS user_count FROM ".$tables['answer']." WHERE f_step_uid = ".$step_uid." GROUP BY f_quiz_uid ) B ON B.f_quiz_uid = A.f_quiz_uid ";
+  $sql .= " LEFT JOIN ".$tables['quiz_view']." C ON ( C.f_quiz_uid = A.f_quiz_uid AND C.f_view_uid = A.f_correct_uid )";
+  $sql .= " WHERE A.f_step_uid = ".$step_uid." ";
+  $sql .= " ORDER BY A.f_show_num ASC";
+  $list = array();
+  $query = mysqli_query($this->dbconn, $sql);
+  while( $data = mysqli_fetch_array( $query,MYSQLI_ASSOC )){
+    $quiz = new Mparkquiz( null, null );
+    $quiz->setFromColumn( $data );
+    array_push($list,$quiz);
+  }
+  return $list;
+}
+
+function selectStep( $uid ){
+  global $tables;
+  if( isset($uid) && $uid >= 0){
+    $sql = "SELECT * FROM ".$tables['step']." WHERE f_step_uid = ".$uid;
+    $query = mysqli_query($this->dbconn, $sql);
+    $data = mysqli_fetch_array( $query,MYSQLI_ASSOC );
+    $step = new Mparkstep( null );
+    $step->setFromColumn($data);
+    return $step;
+  }
+}
+
+function deleteStep( $step_uid ){
+  global $tables;
+  $sql = "DELETE FROM ".$tables['step']." WHERE f_step_uid = ".$step_uid;
+  mysqli_query($this->dbconn, $sql);
+
+  $sql = "UPDATE ".$tables['quiz']." SET f_step_uid = 0 WHERE f_step_uid = ".$step_uid;
+  $query = mysqli_query($this->dbconn, $sql);
+  return $query;
+}
+////////////////////////////////////////////////////////////////
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

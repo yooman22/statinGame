@@ -38,7 +38,7 @@ class Mparkuser {
     $this->user_hospital = $_SESSION['user_hospital'];
     $this->user_depart = $_SESSION['user_depart'];
     $this->user_level = $_SESSION['user_level'];
-    $this->user_session = $_SESSION['user_session'];
+    // $this->user_session = $_SESSION['user_session'];
     $this->user_cscode = $_SESSION['user_cscode'];
     $this->user_mrname = $_SESSION['user_mrname'];
   }
