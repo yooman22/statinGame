@@ -160,8 +160,8 @@ class Mparkuser {
     $json .= '"user_id":"'.$this->user_id.'"';
     $json .= ',"user_name":"'.$this->user_name.'"';
     $json .= ',"user_email":"'.$this->user_email.'"';
-    //$json .= ',"user_knick":"'.$this->user_knick.'"';
-    $json .= ',"user_knick":"'.$this->user_mrname.'"';
+    $json .= ',"user_knick":"'.$this->user_knick.'"';
+    // $json .= ',"user_knick":"'.$this->user_mrname.'"';
     $json .= ',"user_hospital":"'.$this->user_hospital.'"';
     $json .= ',"user_depart":"'.$this->user_depart.'"';
     $json .= ',"user_phone":"'.$this->user_phone.'"';
@@ -177,8 +177,8 @@ class Mparkuser {
     $json .= ',"total_time":'.$this->total_time;
     $json .= ',"user_session":"'.$this->user_session.'"';
     $json .= ',"user_area":"'.$this->user_area.'"';
-    // $json .= ',"user_cscode":"'.$this->user_cscode.'"';
-    // $json .= ',"user_mrname":"'.$this->user_mrname.'"';
+    $json .= ',"user_cscode":"'.$this->user_cscode.'"';
+    $json .= ',"user_mrname":"'.$this->user_mrname.'"';
     $json .= '}';
     return $json;
   }

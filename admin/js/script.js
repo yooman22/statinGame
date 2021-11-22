@@ -48,7 +48,7 @@ function checkOverlapId(){
   data.user_id = f.find('input[name="user_id"]').val();
 
   jsonPost({
-    url:'/admin/proc/api.php'
+    url:'../../admin/proc/api.php'
     ,data:data
     ,success:function(json){
       if( json.message ){
@@ -109,7 +109,7 @@ function submit_add_user(){
   data.user_hospital = f.find('input[name="user_hospital"]').val().trim();
   data.user_mrname = f.find('input[name="user_mrname"]').val().trim();
   jsonPost({
-    url:'/admin/proc/api.php'
+    url:'../../admin/proc/api.php'
     ,data:data
     ,success:function(json){
       alert(json.message);
@@ -241,6 +241,7 @@ function addAnswerViewEnter( e ){
   }
 }
 
+//quiz insert시 보기추가
 function addAnswerView( e ){
   var f = $('#popup_quiz_regist');
   var str = f.find('input[name="inp_view"]').val();
@@ -250,7 +251,12 @@ function addAnswerView( e ){
     return false;
   }
   $('#id_view_list').append(
-    '<tr class="view_list_item"><td class="view_list_num"></td><td class="view_list_quest">' + str + '</td><td><input type="radio" name="inp_correct" /></td><td><button type="button" class="btn btn-primary" data-uid="" onclick="deleteQuizView(event)">삭제</button></td></tr>'
+    '<tr class="view_list_item">'+
+      '<td class="view_list_num"></td>'+
+      '<td class="view_list_quest">' + str + '</td>'+
+      '<td><input type="radio" name="inp_correct" /></td>'+
+      '<td><button type="button" class="btn btn-primary" data-uid="" onclick="deleteQuizView(event)">삭제</button></td>'+
+    '</tr>'
   );
 
   updateViewList();
@@ -302,7 +308,7 @@ function submit_add_quiz( e ){
   });
 
   jsonPost({
-    url:'/admin/proc/api.php'
+    url:'../../admin/proc/adminApi.php'
     ,data:data
     ,success:function(json){
       alert(json.message);
@@ -316,6 +322,8 @@ function submit_add_quiz( e ){
 }
 
 
+
+//퀴즈 상세보기
 function showQuiz( uid ){
   $('#popup_quiz_regist').dialog({
     width:800
@@ -328,7 +336,7 @@ function showQuiz( uid ){
       data.mode = 'view';
 
       jsonPost({
-        url:'/admin/proc/api.php'
+        url:'../../admin/proc/adminApi.php'
         ,data:data
         ,success:function(json){
           var f = $('#popup_quiz_regist');
@@ -354,6 +362,7 @@ function showQuiz( uid ){
   });
 }
 
+//퀴즈 insert시 추가된 보기 삭제
 function deleteQuizView( e ){
   var uid = $( e.target ).data( 'uid' );
   var data = new Object();
@@ -361,7 +370,7 @@ function deleteQuizView( e ){
   data.mode = 'delete';
   data.view_uid = uid;
   jsonPost({
-    url:'/admin/proc/api.php'
+    url:'../../admin/proc/adminApi.php'
     ,data:data
     ,success:function(json){
       $( e.target ).parent().parent().remove();
@@ -400,7 +409,7 @@ function deleteSelectedQuiz(){
     data.quiz_list.push({quiz_uid:parseInt($(this).val())});
   });
   jsonPost({
-    url:'/admin/proc/api.php'
+    url:'../../admin/proc/adminApi.php'
     ,data:data
     ,success:function(json){
       alert(json.message);
@@ -450,7 +459,7 @@ function loadUserInfo( user_uid ){
   data.mode = 'view';
   data.user_uid = user_uid;
   jsonPost({
-    url:'/admin/proc/api.php'
+    url:'../../admin/proc/adminApi.php'
     ,data:data
     ,success:function(json){
       console.log( json );
@@ -479,7 +488,7 @@ function deleteUser( user_uid, user_id ){
     data.user_uid = user_uid;
     jsonPost({
       data:data
-      ,url:'/admin/proc/api.php'
+      ,url:'../../admin/proc/adminApi.php'
       ,success:function(json){
         alert(json.message);
         refresh();

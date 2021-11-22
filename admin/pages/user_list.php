@@ -1,5 +1,8 @@
 <?php
 require_once("../conf/config.php");
+include_once("../include/header.php");
+include_once("../include/function.php");
+
 require_once("../../conf/dbconn.php");
 require_once("../../class/class.mpark.php");
 require_once("../../class/class.mparkquiz.php");
@@ -7,8 +10,7 @@ require_once("../../class/class.mparkquizview.php");
 require_once("../../class/class.mparkuser.php");
 require_once("../../class/class.mparkstep.php");
 require_once("../../class/class.mparksearch.php");
-include_once("../include/header.php");
-include_once("../include/function.php");
+
 
 $mpark = new Mpark( $dbconn );
 $user_search = new Mparkuser();
@@ -49,7 +51,7 @@ $(document).ready(function(){
 </script>
 
 <div class="btn-navi">
-  <button type="button" class="btn btn-secondary" onclick="jumpUrl('/admin/pages/user_list.php?opt=user_name&q=&s=0')">사용자 목록</button>
+  <button type="button" class="btn btn-secondary" onclick="jumpUrl('../../admin/pages/user_list.php?opt=user_name&q=&s=0')">사용자 목록</button>
   <button type="button" class="btn btn-primary" onclick="openUserAdd()">사용자 추가</button>
 </div>
 <div class="list-search">
@@ -73,7 +75,7 @@ $(document).ready(function(){
         <button type="submit" class="btn btn-dark mb-2">조회</button>
       </div>
       <div>
-        <a href="/admin/pages/user_excel_down.php" class="btn btn-dark mb-2" style="margin-left:5px;">엑셀다운</a>
+        <a href="../../admin/pages/user_excel_down.php" class="btn btn-dark mb-2" style="margin-left:5px;">엑셀다운</a>
       </div>
     </div>
   </form>

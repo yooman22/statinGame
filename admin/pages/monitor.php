@@ -1,6 +1,8 @@
 <?php
 session_start();
 require_once("../conf/config.php");
+
+
 require_once("../../conf/dbconn.php");
 require_once("../../class/class.mpark.php");
 require_once("../../class/class.mparkquiz.php");
@@ -17,8 +19,8 @@ if( !$user->user_uid ){
 
 include_once("../include/header.php");
 ?>
-<script src="/js/livest.websocket.js?v=<?php echo time(); ?>"></script>
-<script src="/admin/js/localdb.min.js?v=<?php echo time(); ?>"></script>
+<script src="../../js/livest.websocket.js?v=<?php echo time(); ?>"></script>
+<script src="../../admin/js/localdb.min.js?v=<?php echo time(); ?>"></script>
 <style>
 #id-start-process {
   display: none;

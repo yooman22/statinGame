@@ -1,5 +1,6 @@
 <?php
 require_once("../conf/config.php");
+
 require_once("../../conf/dbconn.php");
 require_once("../../class/class.mpark.php");
 require_once("../../class/class.mparkquiz.php");
@@ -31,7 +32,7 @@ if( isset( $_GET['type'] ) ){
 ?>
 
 <div class="btn-navi">
-  <button type="button" class="btn btn-secondary" onclick="jumpUrl('/admin/pages/quiz_list.php')">전체목록</button>
+  <button type="button" class="btn btn-secondary" onclick="jumpUrl('../../admin/pages/quiz_list.php')">전체목록</button>
   <button type="button" class="btn btn-primary" onclick="openQuizAdd()">퀴즈추가</button>
   <button type="button" class="btn btn-danger" onclick="deleteSelectedQuiz()">선택삭제</button>
 </div>

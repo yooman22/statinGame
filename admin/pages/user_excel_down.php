@@ -1,5 +1,7 @@
 <?php
 require_once("../conf/config.php");
+include_once("../include/function.php");
+
 require_once("../../conf/dbconn.php");
 require_once("../../class/class.mpark.php");
 require_once("../../class/class.mparkquiz.php");
@@ -7,7 +9,7 @@ require_once("../../class/class.mparkquizview.php");
 require_once("../../class/class.mparkuser.php");
 require_once("../../class/class.mparkstep.php");
 require_once("../../class/class.mparksearch.php");
-include_once("../include/function.php");
+
 
 $mpark = new Mpark( $dbconn );
 $user_search = new Mparkuser();

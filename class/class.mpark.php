@@ -97,6 +97,31 @@ class Mpark {
     return $data['CNT'];
   }
 
+  //회원정보 수정
+  function updateUser( $json_data ){
+    global $tables;
+    $user = new Mparkuser();
+    $user->setFromJson( $json_data );
+    $sql = "UPDATE ".$tables['user']." SET ";
+    $sql .= "f_user_id = ".$this->checkValue($user->user_id);
+    if( trim($user->user_pwd) ){
+      $sql .= ",f_user_pwd = PASSWORD(".$this->checkValue($user->user_pwd).")";
+    }
+    $sql .= ",f_modify_date = now()";
+    $sql .= ",f_user_cscode = ".$this->checkValue($user->user_cscode);
+    $sql .= ",f_user_hospital = ".$this->checkValue($user->user_hospital);
+    $sql .= ",f_user_level = ".$this->checkValue($user->user_level);
+    $sql .= ",f_user_mrname = ".$this->checkValue($user->user_mrname);
+    if( $user->user_uid ){
+      $sql .= " WHERE f_user_uid = ".$user->user_uid;
+    }else{
+      $sql .= " WHERE 1=0";
+    }
+    $query = mysqli_query($this->dbconn, $sql);
+    return $query;
+  }
+
+
   //비밀번호 변경
   function updateUser2( $json_data ){
     global $tables;
@@ -144,6 +169,7 @@ class Mpark {
 
 
 ////////////////////////////////////////////////////////////////
+//차시 CRUD
 function insertStep( $json_data ){
   global $tables;
   $dto = new Mparkstep( null );
@@ -228,16 +254,220 @@ function deleteStep( $step_uid ){
   return $query;
 }
 ////////////////////////////////////////////////////////////////
+//퀴즈 CRUD
+
+function selectQuiz( $quiz_uid ){
+  global $tables;
+  $sql = "SELECT * FROM ".$tables['quiz']." WHERE f_quiz_uid = ".$quiz_uid;
+  $query = mysqli_query($this->dbconn, $sql);
+  $data = mysqli_fetch_array( $query,MYSQLI_ASSOC );
+  $quiz = new Mparkquiz( null, null );
+  $quiz->setFromColumn( $data );
+  return $quiz;
+}
 
 
 
+function selectQuizList( $step_uid ){
+  global $tables;
+  //$sql = "SELECT * FROM ".$tables['quiz']." WHERE f_step_uid = 0 OR f_step_uid = ".$step_uid." ORDER BY f_reg_date DESC";
+  $sql = "SELECT * FROM ".$tables['quiz']." WHERE 1=1 ORDER BY f_reg_date DESC";
+  $list = array();
+  $query = mysqli_query($this->dbconn, $sql);
+  while( $data = mysqli_fetch_array( $query,MYSQLI_ASSOC )){
+    $quiz = new Mparkquiz( null, null );
+    $quiz->setFromColumn( $data );
+    array_push($list,$quiz);
+  }
+  return $list;
+}
 
 
 
+function insertQuiz( $quiz_data ){
+  global $tables;
+  $sql = "INSERT INTO ".$tables['quiz']."(f_quest, f_reg_date, f_user_uid, f_wait_count, f_correct_uid,f_show_num) VALUES (";
+  $sql .= $this->checkValue($quiz_data->quest);
+  $sql .= ",now()";
+  $sql .= ",".$this->checkValue($quiz_data->user_uid);
+  $sql .= ",".$this->checkValue($quiz_data->wait_count);
+  $sql .= ",".$this->checkValue($quiz_data->correct_uid);
+  $sql .= ",".$this->checkValue($quiz_data->show_num);
+  $sql .= ")";
+  $query = mysqli_query($this->dbconn, $sql);
+  $uid = 0;
+  if( $query ){
+    $uid = mysqli_insert_id($this->dbconn);
+  }
+  return $uid;
+}
+
+function updateQuiz( $quiz_data ){
+  global $tables;
+
+  $sql = "UPDATE ".$tables['quiz']." SET ";
+  $sql .= "f_quest = ".$this->checkValue($quiz_data->quest);
+  $sql .= ",f_correct_uid = ".$this->checkValue($quiz_data->correct_uid);
+  $sql .= ",f_wait_count = ".$this->checkValue($quiz_data->wait_count);
+  $sql .= " WHERE ";
+  if($quiz_data->quiz_uid){
+    $sql .= "f_quiz_uid = ".$quiz_data->quiz_uid;
+  }else{
+    $sql .= "1=0";
+  }
+  $query = mysqli_query($this->dbconn, $sql);
+  return $query;
+}
+
+function deleteQuiz( $quiz_uid ){
+  global $tables;
+  $sql = "DELETE FROM ".$tables['quiz_view']." WHERE f_quiz_uid = ".$quiz_uid;
+  mysqli_query($this->dbconn, $sql);
+
+  $sql = "DELETE FROM ".$tables['quiz']." WHERE f_quiz_uid = ".$quiz_uid;
+  $query = mysqli_query($this->dbconn, $sql);
+  return $query;
+}
 
 
+function insertQuizView( $quiz_data ){
+  global $tables;
+  $sql = "INSERT INTO ".$tables['quiz_view']." (f_quiz_uid, f_view_content, f_seq_no, f_user_uid, f_reg_date, f_modify_date) VALUES (";
+  $sql .= $this->checkValue($quiz_data->quiz_uid);
+  $sql .= ",".$this->checkValue($quiz_data->view_content);
+  $sql .= ",".$this->checkValue($quiz_data->seq_no);
+  $sql .= ",".$this->checkValue($quiz_data->user_uid);
+  $sql .= ",now()";
+  $sql .= ",now()";
+  $sql .= ")";
+  $query = mysqli_query($this->dbconn, $sql);
+  $uid = 0;
+  if( $query ){
+    $uid = mysqli_insert_id($this->dbconn);
+  }
+  //echo $sql;
+  return $uid;
+}
+
+function listQuizView( $quiz_uid ){
+  global $tables;
+  $sql = "SELECT B.*, A.f_view_content, A.f_view_uid, A.f_seq_no FROM ".$tables['quiz_view']." A INNER JOIN ".$tables['quiz']." B ON B.f_quiz_uid = A.f_quiz_uid WHERE A.f_quiz_uid = ".$quiz_uid." ORDER BY A.f_seq_no ASC";
+  $list = array();
+  $query = mysqli_query($this->dbconn, $sql);
+  while( $data = mysqli_fetch_array( $query,MYSQLI_ASSOC )){
+    $quiz = new Mparkquizview( null, null, null );
+    $quiz->setFromColumn( $data );
+    array_push($list,$quiz);
+  }
+  return $list;
+}
 
 
+function deleteQuizView( $view_uid ){
+  global $tables;
+  $sql = "DELETE FROM ".$tables['quiz_view']." WHERE ";
+  if($view_uid){
+    $sql .= " f_view_uid = ".$view_uid;
+  }else{
+    $sql .= " 1=0 ";
+  }
+  $query = mysqli_query($this->dbconn, $sql);
+  return $query;
+}
+
+function deleteAllViw( $quiz_uid ){
+  global $tables;
+  $sql = "DELETE FROM ".$tables['quiz_view']." WHERE ";
+  if($quiz_uid){
+    $sql .= " f_quiz_uid = ".$quiz_uid;
+  }else{
+    $sql .= " 1=0 ";
+  }
+  $query = mysqli_query($this->dbconn, $sql);
+  return $query;
+}
+
+
+////////////////////////////////////////////////////////////////
+//user CRUD
+function getUserTotal( $user_data ){
+  global $tables;
+  $sql = "SELECT COUNT(*) AS cnt FROM ".$tables['user']." WHERE 1=1";
+  if(isset($user_data)){
+    if( $user_data->user_id ){
+      $sql .= " AND f_user_id LIKE '%".$user_data->user_id."%'";
+    }
+    if( $user_data->user_name ){
+      $sql .= " AND f_user_name LIKE '%".$user_data->user_name."%'";
+    }
+    if( $user_data->user_phone ){
+      $sql .= " AND f_user_phone LIKE '%".$user_data->user_phone."%'";
+    }
+    if( $user_data->user_knick ){
+      $sql .= " AND f_user_knick LIKE '%".$user_data->user_knick."%'";
+    }
+  }else{
+    $sql .= " 1=1 ";
+  }
+  $query = mysqli_query($this->dbconn, $sql );
+  $data = mysqli_fetch_array( $query, MYSQLI_ASSOC );
+  return $data['cnt'];
+}
+
+
+function selectUser( $user_data, $start = 0, $limit = 50 ){
+  global $tables;
+  $list = array();
+  $user = new Mparkuser();
+  $sql = "SELECT * FROM ".$tables['user']." WHERE 1=1";
+
+  if(isset($user_data)){
+    if( $user_data->user_id ){
+      $sql .= " AND f_user_id LIKE '%".$user_data->user_id."%'";
+    }
+    if( $user_data->user_name ){
+      $sql .= " AND f_user_name LIKE '%".$user_data->user_name."%'";
+    }
+    if( $user_data->user_phone ){
+      $sql .= " AND f_user_phone LIKE '%".$user_data->user_phone."%'";
+    }
+    if( $user_data->user_knick ){
+      $sql .= " AND f_user_knick LIKE '%".$user_data->user_knick."%'";
+    }
+  }else{
+    $sql .= " 1=1 ";
+  }
+  $sql .= " ORDER BY f_reg_date DESC";
+  $sql .= " LIMIT ".$start.",".$limit;
+  $query = mysqli_query($this->dbconn, $sql );
+  while( $data = mysqli_fetch_array( $query, MYSQLI_ASSOC )){
+    array_push( $list, new Mparkuser($data));
+  }
+  return $list;
+}
+
+
+function getUserInfo( $user_uid ){
+  global $tables;
+  $list = array();
+  $user = new Mparkuser();
+  $sql = "SELECT * FROM ".$tables['user']." WHERE f_user_uid = ".$this->checkValue($user_uid);
+  $query = mysqli_query($this->dbconn, $sql );
+  $data = mysqli_fetch_array( $query, MYSQLI_ASSOC );
+  return new Mparkuser($data);
+}
+
+
+function deleteUser( $user_uid ){
+  global $tables;
+  if($user_uid){
+    $sql = "DELETE FROM ".$tables['user']." WHERE f_user_uid = ".$user_uid;
+    $query = mysqli_query($this->dbconn, $sql );
+    return $query;
+  }
+  return 0;
+}
+////////////////////////////////////////////////////////////////
 
 
 
